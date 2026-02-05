@@ -3,9 +3,12 @@
 progname=$(basename $0)
 
 function usage(){
-	echo -e "Usage: $progname BENCHMARK [-o FILE]"
-	echo -e "\tBENCHMARK\n\t\tA folder under /bench which has rtl files at /bench/BENCHMARK/rtl"
-	echo -e "\t-o FILE\n\t\tOutput file path\n\t\tDefaults to /bench/BENCHMARK/BENCHMARK.f"
+	echo -e "Usage: $progname BENCHMARK [-o [FILE]]\n\
+ BENCHMARK\n\
+\tA folder under /bench which has rtl files at /bench/BENCHMARK/rtl\n\
+ -o [FILE]\n\
+ \tOutput file path\n\
+ \tDefaults to /bench/BENCHMARK/BENCHMARK.f"
 }
 
 if [[ "$#" -lt 1 ]]; then
