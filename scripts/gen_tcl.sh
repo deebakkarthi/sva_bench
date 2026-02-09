@@ -53,6 +53,7 @@ fi
 
 cat > $output_file <<EOF
 # AUTO-GENERATED USING $progname
+# PLEASE CHANGE clock and reset to the appropriate signals
 
 clear -all
 
