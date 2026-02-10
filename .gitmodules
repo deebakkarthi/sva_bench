@@ -1,0 +1,3 @@
+[submodule "svabench/pyverilog"]
+	path = svabench/pyverilog
+	url = git@github.com:deebakkarthi/pyverilog.git
