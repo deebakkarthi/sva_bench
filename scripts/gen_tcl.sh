@@ -57,7 +57,7 @@ cat > $output_file <<EOF
 
 clear -all
 
-analyze -sv -f ${benchmark}.f
+analyze -v2k -f ${benchmark}.f
 
 elaborate
 

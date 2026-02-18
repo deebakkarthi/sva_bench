@@ -1,5 +1,5 @@
 clear -all
 
-analyze -sv -f uart.f
+analyze -v2k -f uart.f
 
 elaborate

@@ -1,5 +1,5 @@
 clear -all
 
-analyze -sv -f ethmac.f
+analyze -v2k -f ethmac.f
 
 elaborate

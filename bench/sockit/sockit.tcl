@@ -1,5 +1,5 @@
 clear -all
 
-analyze -sv -f sockit.f
+analyze -v2k -f sockit.f
 
 elaborate

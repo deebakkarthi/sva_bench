@@ -1,5 +1,5 @@
 clear -all
 
-analyze -sv -f openmsp430.f
+analyze -v2k -f openmsp430.f
 
 elaborate

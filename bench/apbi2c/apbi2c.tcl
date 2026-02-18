@@ -1,6 +1,6 @@
 clear -all
 
-analyze -sv -f apbi2c.f
+analyze -v2k -f apbi2c.f
 
 elaborate
 
