@@ -5,21 +5,17 @@ module one_bit_adder_assert (
     output wire     cy
 );
 
-    sum_xor_correctness : assert property (@(a or b) sum == (a ^ b));
-
-    carry_and_correctness : assert property (@(a or b) cy == (a & b));
-
-    no_carry_when_inputs_zero : assert property (@(a or b) (!a && !b) |-> (!sum && !cy));
-
-    sum_one_carry_zero_when_one_input : assert property (@(a or b) (a ^ b) |-> (sum && !cy));
-
-    sum_zero_carry_one_when_both_inputs_one : assert property (@(a or b) (a && b) |-> (!sum && cy));
-
-    sum_and_carry_not_both_one : assert property (@(a or b) !(sum && cy));
-
-    carry_implies_both_inputs_one : assert property (@(a or b) cy |-> (a && b));
-
-    sum_high_implies_exactly_one_input : assert property (@(a or b) sum |-> (a ^ b));
+    sum_correct : assert property (sum == (a ^ b));
+    carry_correct : assert property (cy == (a & b));
+    no_carry_when_inputs_differ : assert property ((a ^ b) |-> !cy);
+    carry_only_when_both_inputs_high : assert property (cy |-> (a & b));
+    sum_zero_when_inputs_equal : assert property ((a == b) |-> !sum);
+    sum_one_when_inputs_differ : assert property ((a ^ b) |-> sum);
+    both_zero_no_sum_no_carry : assert property ((!a && !b) |-> (!sum && !cy));
+    both_one_no_sum_with_carry : assert property ((a && b) |-> (!sum && cy));
+    a_one_b_zero_sum_no_carry : assert property ((a && !b) |-> (sum && !cy));
+    a_zero_b_one_sum_no_carry : assert property ((!a && b) |-> (sum && !cy));
+    sum_and_carry_mutually_exclusive : assert property (!(sum && cy));
 
 endmodule
 
