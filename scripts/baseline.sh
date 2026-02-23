@@ -71,23 +71,25 @@ fi
 
 log "Checking if \$SVABENCH_ROOT is set"
 if [ -z "$SVABENCH_ROOT" ]; then
-	SVABENCH_ROOT=$(git rev-parse --show-toplevel)
-	SVABENCH_ROOT=$(realpath $SVABENCH_ROOT)
 	log "\$SVABENCH_ROOT is not set"
+	log "Setting it using git rev-parse --show-toplevel"
+	SVABENCH_ROOT=$(git rev-parse --show-toplevel)
 fi
+SVABENCH_ROOT=$(realpath $SVABENCH_ROOT)
 log "\$SVABENCH_ROOT is set to $SVABENCH_ROOT"
 
 
-log "\$output_dir_prefix is $output_dir_prefix"
+log "Output will be stored under $output_dir_prefix"
 
-log "Checking if $output_dir_prefix exists, if not creating it"
+log "Checking if $output_dir_prefix exists"
 # create parent dir
 if [ ! -d "$output_dir_prefix" ]; then
+	log "$output_dir_prefix doesn't exists, creating it"
 	mkdir -p $output_dir_prefix
 fi
 
 output_dir=$output_dir_prefix/$(date +"%Y%m%dT%H%M%S")
-log "Results will be stored under $output_dir"
+log "The output is a folder and will be stored under $output_dir"
 log "Creating $output_dir"
 # create output dir
 if [ ! -d "$output_dir" ]; then
@@ -127,8 +129,13 @@ for benchmark_path in ${benchmarks[@]}; do
 		filename_without_ext=$(basename $file | awk -F"." '{$NF=""; print}' | sed 's/[[:blank:]]*$//' )
 		log "Processing $benchmark:$(basename $file)"
 		log "Prompting Claude"
+
+		start_time=$SECONDS
 		assertions=$(cat $file | claude --print --no-session-persistence --tools ""\
 			--model haiku --no-chrome  --system-prompt "$system_prompt")
+		end_time=$SECONDS
+		log "Claude took $(( end_time - start_time ))s"
+
 		echo "$assertions" > "${sva_path}/${filename_without_ext}.sv"
 		log "Wrote assertions to $filename_without_ext.sv"
 	done
