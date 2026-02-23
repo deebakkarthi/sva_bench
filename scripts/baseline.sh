@@ -72,6 +72,7 @@ fi
 log "Checking if \$SVABENCH_ROOT is set"
 if [ -z "$SVABENCH_ROOT" ]; then
 	SVABENCH_ROOT=$(git rev-parse --show-toplevel)
+	SVABENCH_ROOT=$(realpath $SVABENCH_ROOT)
 	log "\$SVABENCH_ROOT is not set"
 fi
 log "\$SVABENCH_ROOT is set to $SVABENCH_ROOT"
@@ -131,4 +132,6 @@ for benchmark_path in ${benchmarks[@]}; do
 		echo "$assertions" > "${sva_path}/${filename_without_ext}.sv"
 		log "Wrote assertions to $filename_without_ext.sv"
 	done
+	$SVABENCH_ROOT/scripts/gen_command_file_standalone.sh $sva_path > "$output_dir/$benchmark/${benchmark}_sva.f"
+	log "Created command file for the assertions"
 done
