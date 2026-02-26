@@ -5,14 +5,29 @@ _V=0
 read -r -d '' prompt <<'EOF'
 Read the following verilog code and generate all systemverilog assertions.
 # Output Format
-- Output *only* the assertions.
-- Don't format using ```systemverilog.
-- Don't declare the properties separately. Include them inline with the assertion.
-- Give descriptive label for each assertion
-The general syntax for systemverilog assertion is
+- The general syntax for systemverilog assertion is
 ```systemverilog
 label : assert property (property_specification);
-
+```
+- Output *only* the assertions. No need to explain them.
+- Don't format using the ```systemverilog``` block. I have formatted the instructions 
+with them to clearly demarcate the code to you. You don't need to do that. Output only the raw code. 
+What you output will be piped directly a ".sv" file. Hence only output syntactically 
+correct systemverilog tokens.
+- Don't declare the properties separately. Include them inline with the assertion.
+	- *Don't * do this
+	```systemverilog
+	  property handshake;
+	    @(posedge Clock) request |-> acknowledge;
+	  endproperty
+	  assert property (handshake);
+	```
+	- *Do* this
+	```systemverilog
+	handshake: assert property (@(posedge Clock) request |-> acknowledge);
+	```
+- Give descriptive label for each assertion
+- Output only `assert`. Don't output `cover` or `assume`.
 - Create a new module whose name is the original name suffixed with "_assert"
 	- For example, for a module called "half_adder", create another module called "half_adder_assert"
 	- The port of the two modules has to be exactly the same.
@@ -21,21 +36,55 @@ label : assert property (property_specification);
 the name of the module is the name of the assertions module suffixed with "_instance"
 Example: 
 bind my_module my_module_sva my_module_sva_instance (.*);
+- If you want to reference internal items use hierarchical access.
+If you want to access an internal item called "RX_FULL" in the module "my_module",
+use "my_module.RX_FULL" when you are writing "my_module_assert".
+Don't use "my_module_assert_instance.RX_FULL" or "my_module_assert.RX_FULL". 
+Both of these are wrong. Access from the original module given as input.
+
+## Complete Example
+Lets suppose the following verilog as an example input
+```verilog
+module fulladd (  input [3:0] a,
+                  input [3:0] b,
+                  input c_in,
+                  output c_out,
+                  output [3:0] sum);
+
+   assign {c_out, sum} = a + b + c_in;
+endmodule
+```
+Output something like this
+```systemverilog
+module fulladd_assert (  input [3:0] a,
+                  input [3:0] b,
+                  input c_in,
+                  output c_out,
+                  output [3:0] sum);
+// ASSERTIONS HERE
+endmodule
+
+bind fulladd fulladd_assert fulladd_assert_instance (.*);
 ```
 EOF
 
 function usage(){
-	echo -e "Usage: $progname [-o FOLDER] [-v]\n\
+	echo -e "Usage: $progname [-o FOLDER] [-v] [-n NAME]\n\
  -o FOLDER\n\
  \tOutput Folder path\n\
  \tDefaults to \$SVABENCH_ROOT/results/
- -v Verbose output"
+ -v Verbose output
+ -n Description of the run (Eg: modified_systemprompt)"
 }
 
 function log(){
 	if [[ "$_V" -eq 1 ]]; then
 		echo "[INFO] [$(date '+%Y-%m-%d %H:%M:%S')] $*"
 	fi
+}
+
+function sanitize_string(){
+	echo $1 | sed 's/[[:blank:]]*$//;s/[[:blank:]]\{1,\}/_/g;'  |  tr '[:upper:]' '[:lower:]' | tr -d -C '[:alnum:] _'
 }
 
 
@@ -45,9 +94,10 @@ function log(){
 while (( "$#" )); do
 	case $1 in
 		"-o")
-			if [ -z $2 ]; then
+			if [ ! -z $2 ]; then
 				output_dir_prefix=$2
 				log "-o specified, outputting to $output_dir_prefix"
+				shift
 			else
 				usage
 				exit 1
@@ -55,6 +105,17 @@ while (( "$#" )); do
 			;;
 		"-v")
 			_V=1
+			;;
+		"-n")
+			if [[ ! -z $2 ]]; then
+				output_dir_suffix="$2"
+				output_dir_suffix="$(sanitize_string "$output_dir_suffix")"
+				log "-n specified, output will be suffixed with $output_dir_suffix"
+				shift
+			else
+				usage
+				exit 1
+			fi
 			;;
 		*)
 			usage
@@ -88,7 +149,12 @@ if [ ! -d "$output_dir_prefix" ]; then
 	mkdir -p $output_dir_prefix
 fi
 
-output_dir=$output_dir_prefix/$(date +"%Y%m%dT%H%M%S")
+if [[ ! -z $output_dir_suffix ]];then
+	output_dir="$output_dir_prefix/$(date +"%Y%m%dT%H%M%S")--${output_dir_suffix}"
+else
+	output_dir="$output_dir_prefix/$(date +"%Y%m%dT%H%M%S")"
+fi
+
 log "The output is a folder and will be stored under $output_dir"
 log "Creating $output_dir"
 # create output dir
@@ -110,6 +176,11 @@ for benchmark_path in ${benchmarks[@]}; do
 
 	ln -s "$benchmark_path/$benchmark.f"\
 	       	"$output_dir/$benchmark/$benchmark.f"
+	log "Created symlink to "$benchmark_path/$benchmark.f$""
+
+	ln -s "$benchmark_path/$benchmark.tcl"\
+	       	"$output_dir/$benchmark/$benchmark.tcl"
+	log "Created symlink to "$benchmark_path/$benchmark.tcl$""
 
 	#mkdir -p "$output_dir/$benchmark/rtl"
 
@@ -126,13 +197,16 @@ for benchmark_path in ${benchmarks[@]}; do
 
 	readarray rtl_files < <( find -L $rtl_path -type f \( -name '*.v' -o -name '*.sv' \) )
 	for file in ${rtl_files[@]}; do
+		cd "$output_dir/$benchmark"
+		log "cd into "$output_dir/$benchmark""
+
 		filename_without_ext=$(basename $file | awk -F"." '{$NF=""; print}' | sed 's/[[:blank:]]*$//' )
 		log "Processing $benchmark:$(basename $file)"
 		log "Prompting Claude"
 
 		start_time=$SECONDS
-		assertions=$(cat $file | claude --print --no-session-persistence --tools ""\
-			--model sonnet --no-chrome  "$prompt")
+		assertions=$(cat $file | claude --print --tools ""\
+			--model sonnet --no-chrome --system-prompt "$prompt")
 		end_time=$SECONDS
 		log "Claude took $(( end_time - start_time ))s"
 
