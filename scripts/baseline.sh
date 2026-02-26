@@ -2,7 +2,7 @@
 
 progname=$(basename $0)
 _V=0
-read -r -d '' system_prompt <<'EOF'
+read -r -d '' prompt <<'EOF'
 Read the following verilog code and generate all systemverilog assertions.
 # Output Format
 - Output *only* the assertions.
@@ -132,7 +132,7 @@ for benchmark_path in ${benchmarks[@]}; do
 
 		start_time=$SECONDS
 		assertions=$(cat $file | claude --print --no-session-persistence --tools ""\
-			--model haiku --no-chrome  --system-prompt "$system_prompt")
+			--model sonnet --no-chrome  "$prompt")
 		end_time=$SECONDS
 		log "Claude took $(( end_time - start_time ))s"
 
