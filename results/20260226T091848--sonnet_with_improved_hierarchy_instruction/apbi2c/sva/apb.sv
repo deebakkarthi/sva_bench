@@ -10,16 +10,16 @@ module apb_assert(
 			input ERROR,
 			input TX_EMPTY,
 			input RX_EMPTY,
-			output [31:0] PRDATA,
-			output reg [13:0] INTERNAL_I2C_REGISTER_CONFIG,
-			output reg [13:0] INTERNAL_I2C_REGISTER_TIMEOUT,
-			output [31:0] WRITE_DATA_ON_TX,
-			output WR_ENA,
-			output RD_ENA,
-			output PREADY,
-			output PSLVERR,
-			output INT_RX,
-			output INT_TX
+			input [31:0] PRDATA,
+			input [13:0] INTERNAL_I2C_REGISTER_CONFIG,
+			input [13:0] INTERNAL_I2C_REGISTER_TIMEOUT,
+			input [31:0] WRITE_DATA_ON_TX,
+			input WR_ENA,
+			input RD_ENA,
+			input PREADY,
+			input PSLVERR,
+			input INT_RX,
+			input INT_TX
 		);
 
 // WR_ENA assertions

@@ -6,8 +6,8 @@ module fifo_assert
 (
 	input clock, reset, wr_en, rd_en,
 	input [DWIDTH-1:0] data_in,
-	output f_full, f_empty,
-	output [DWIDTH-1:0] data_out
+	input f_full, f_empty,
+	input [DWIDTH-1:0] data_out
 );
 
     // After reset, write pointer should be 0
@@ -122,6 +122,7 @@ module fifo_assert
         @(posedge clock) data_out == fifo.mem[fifo.rd_ptr]
     );
 
-endmodule
+    endmodule
 
-bind fifo fifo_assert #(.DWIDTH(DWIDTH), .AWIDTH(AWIDTH)) fifo_assert_instance (.*);
+bind fifo fifo_assert #(.DWIDTH(DWIDTH), .AWIDTH(AWIDTH)) fifo_assert_instance
+(.*);
