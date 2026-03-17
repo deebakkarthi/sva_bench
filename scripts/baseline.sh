@@ -30,7 +30,9 @@ correct systemverilog tokens.
 - Output only `assert`. Don't output `cover` or `assume`.
 - Create a new module whose name is the original name suffixed with "_assert"
 	- For example, for a module called "half_adder", create another module called "half_adder_assert"
-	- The port of the two modules has to be exactly the same.
+	- The assertion module must only contain input ports. All ports from the original module
+	(whether declared as input or output) must be declared as input in the assertion module.
+	Assertion modules only observe signals; they never drive outputs.
 - Place all of these assertions under that module
 - Create a bind construct to bind these two modules. Use implicit port connection syntax.
 the name of the module is the name of the assertions module suffixed with "_instance"
@@ -59,8 +61,8 @@ Output something like this
 module fulladd_assert (  input [3:0] a,
                   input [3:0] b,
                   input c_in,
-                  output c_out,
-                  output [3:0] sum);
+                  input c_out,
+                  input [3:0] sum);
 // ASSERTIONS HERE
 endmodule
 
