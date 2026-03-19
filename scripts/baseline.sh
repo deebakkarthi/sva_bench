@@ -207,7 +207,7 @@ for benchmark_path in ${benchmarks[@]}; do
 		log "Prompting Claude"
 
 		start_time=$SECONDS
-		assertions=$(cat $file | claude --print --tools ""\
+		assertions=$(cat $file | claude --continue --print --tools ""\
 			--model sonnet --no-chrome --system-prompt "$prompt")
 		end_time=$SECONDS
 		log "Claude took $(( end_time - start_time ))s"
