@@ -3,17 +3,7 @@
 progname=$(basename $0)
 _V=0
 read -r -d '' prompt <<'EOF'
-Read the following verilog code and generate systemverilog assertions.
-Capture all specifications that match the following patterns
-
-```ltl
-G(Antecedent |-> Consequent)
-G(Antecedent |=> Consequent)
-```
-
-Where G indicates that this holds globally
-|-> indicates overlapping implication (Same cycle)
-|=> indicates same non-overlapping implication (Next cycle)
+Read the following verilog code and generate all systemverilog assertions.
 
 # Output Format
 - The general syntax for systemverilog assertion is
@@ -219,7 +209,7 @@ for benchmark_path in ${benchmarks[@]}; do
 
 		start_time=$SECONDS
 		assertions=$(cat $file | claude --continue --print --tools ""\
-			--model opus --no-chrome --system-prompt "$prompt")
+			--model sonnet --no-chrome --system-prompt "$prompt")
 		end_time=$SECONDS
 		log "Claude took $(( end_time - start_time ))s"
 
