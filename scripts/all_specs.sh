@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
 progname=$(basename $0)
+
 _V=0
+_MODEL="sonnet"
+
 read -r -d '' prompt <<'EOF'
 Read the following verilog code and generate all systemverilog assertions.
 
@@ -72,12 +75,13 @@ bind fulladd fulladd_assert fulladd_assert_instance (.*);
 EOF
 
 function usage(){
-	echo -e "Usage: $progname [-o FOLDER] [-v] [-n NAME]\n\
+	echo -e "Usage: $progname [-o FOLDER] [-v] [-n NAME] [-m MODEL]\n\
  -o FOLDER\n\
  \tOutput Folder path\n\
  \tDefaults to \$SVABENCH_ROOT/results/
  -v Verbose output
- -n Description of the run (Eg: modified_systemprompt)"
+ -n Description of the run (Eg: modified_systemprompt)
+ -m Model to use. Acceptable models are haiku, sonnet or opus"
 }
 
 function log(){
@@ -115,6 +119,14 @@ while (( "$#" )); do
 				output_dir_suffix="$(sanitize_string "$output_dir_suffix")"
 				log "-n specified, output will be suffixed with $output_dir_suffix"
 				shift
+			else
+				usage
+				exit 1
+			fi
+			;;
+		"-m")
+			if [[ ! -z "$2" ]]; then
+				_MODEL="$2"
 			else
 				usage
 				exit 1
@@ -209,7 +221,7 @@ for benchmark_path in ${benchmarks[@]}; do
 
 		start_time=$SECONDS
 		assertions=$(cat $file | claude --continue --print --tools ""\
-			--model sonnet --no-chrome --system-prompt "$prompt")
+			--model "${_MODEL}" --no-chrome --system-prompt "$prompt")
 		end_time=$SECONDS
 		log "Claude took $(( end_time - start_time ))s"
 
