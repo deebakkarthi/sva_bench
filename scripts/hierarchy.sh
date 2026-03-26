@@ -8,6 +8,15 @@ _MODEL="sonnet"
 
 read -r -d '' system_prompt <<'EOF'
 You are an expert Hardware Verification Engineer.
+The design hierarchy is as follows
+i2c (i2c)
+|-> DUT_FIFO_TX (fifo)
+|-> DUT_FIFO_RX (fifo)
+|-> DUT_APB (apb)
+|-> DUT_I2C_INTERNAL_RX_TX (module_i2c)
+
+Don't generate assertion for the input signals of the top module (i2c).
+Keep the design hierarchy in mind while generating the assertions.
 EOF
 
 read -r -d '' prompt <<'EOF'
