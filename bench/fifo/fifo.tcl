@@ -1,0 +1,17 @@
+# AUTO-GENERATED USING gen_tcl.sh
+# PLEASE CHANGE clock and reset to the appropriate signals
+
+clear -all
+
+analyze -sv -f fifo.f
+analyze -sv -f fifo_sva.f
+
+check_cov -init -type mutation
+
+elaborate
+
+clock i_clk
+reset -none
+
+prove -all
+check_cov -measure
