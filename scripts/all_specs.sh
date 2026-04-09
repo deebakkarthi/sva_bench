@@ -5,12 +5,8 @@ progname=$(basename $0)
 _V=0
 _MODEL="sonnet"
 
-
-read -r -d '' system_prompt <<'EOF'
-You are an expert Hardware Verification Engineer.
-EOF
-
 read -r -d '' prompt <<'EOF'
+You are an expert Hardware Verification Engineer.
 Read the following verilog code and generate all systemverilog assertions.
 
 # Output Format
@@ -226,7 +222,7 @@ for benchmark_path in ${benchmarks[@]}; do
 
 		start_time=$SECONDS
 		assertions=$(cat $file | claude --continue --print --tools ""\
-			--model "${_MODEL}" --no-chrome --system-prompt "$system_prompt" "$prompt")
+			--model "${_MODEL}" --no-chrome "$prompt")
 		end_time=$SECONDS
 		log "Claude took $(( end_time - start_time ))s"
 
