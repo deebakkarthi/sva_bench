@@ -15,3 +15,4 @@ reset -none
 
 prove -all
 check_cov -measure
+check_cov -report
