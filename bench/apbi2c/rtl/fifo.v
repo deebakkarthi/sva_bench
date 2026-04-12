@@ -153,7 +153,7 @@ module fifo
 	assign rd = (rd_en && !f_empty)?rd_ptr+ 4'd1:rd_ptr+ 4'd0;
 	assign w_counter = (rd_en && !f_empty && !wr_en)? counter - 4'd1:
 			   (wr_en && !f_full && !rd_en)? counter + 4'd1:
-			    w_counter + 4'd0;
+			    counter + 4'd0;
 	//assign wr_en_ram = wr_en;
 	//assign rd_en_ram = rd_en;
 	assign data_out = mem[rd_ptr];//data_ram_out;

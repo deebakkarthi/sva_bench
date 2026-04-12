@@ -5,8 +5,7 @@ progname=$(basename $0)
 _V=0
 _MODEL="sonnet"
 
-
-read -r -d '' system_prompt <<'EOF'
+read -r -d '' prompt <<'EOF'
 You are an expert Hardware Verification Engineer.
 The design hierarchy is as follows
 i2c (i2c)
@@ -17,9 +16,7 @@ i2c (i2c)
 
 Don't generate assertion for the input signals of the top module (i2c).
 Keep the design hierarchy in mind while generating the assertions.
-EOF
 
-read -r -d '' prompt <<'EOF'
 Read the following verilog code and generate all systemverilog assertions.
 
 # Output Format
@@ -235,7 +232,7 @@ for benchmark_path in ${benchmarks[@]}; do
 
 		start_time=$SECONDS
 		assertions=$(cat $file | claude --continue --print --tools ""\
-			--model "${_MODEL}" --no-chrome --system-prompt "$system_prompt" "$prompt")
+			--model "${_MODEL}" --no-chrome --system-prompt "$prompt")
 		end_time=$SECONDS
 		log "Claude took $(( end_time - start_time ))s"
 
