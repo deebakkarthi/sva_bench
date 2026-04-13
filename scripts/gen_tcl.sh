@@ -58,9 +58,10 @@ cat > $output_file <<EOF
 clear -all
 
 analyze -v2k -f ${benchmark}.f
+analyze -sv -f ${benchmark}_sva.f
 
 elaborate
 
 clock clk
-reset reset
+reset -none
 EOF
