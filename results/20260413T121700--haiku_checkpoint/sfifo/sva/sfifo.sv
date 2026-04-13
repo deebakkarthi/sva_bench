@@ -1,4 +1,3 @@
-```systemverilog
 module sfifo_assert #(
 	parameter DW = 8,
 	parameter LGFLEN = 4
@@ -47,4 +46,3 @@ read_blocked_when_empty: assert property (@(posedge i_clk) disable iff (i_reset)
 endmodule
 
 bind sfifo sfifo_assert #(.DW(DW), .LGFLEN(LGFLEN)) sfifo_assert_instance (.*);
-```

@@ -1,4 +1,3 @@
-```systemverilog
 module counter_assert #(
     parameter [15:0] MAX_AMOUNT = 22
 ) (
@@ -23,4 +22,3 @@ counter_non_negative: assert property (@(posedge i_clk) counter >= 0);
 endmodule
 
 bind counter counter_assert counter_assert_instance (.*);
-```

@@ -1,4 +1,3 @@
-```systemverilog
 module dblpipe_assert (
     input wire i_clk,
     input wire i_ce,
@@ -15,4 +14,3 @@ o_data_pipeline_correct: assert property (@(posedge i_clk) o_data == ($past(dblp
 endmodule
 
 bind dblpipe dblpipe_assert dblpipe_assert_instance (.*);
-```

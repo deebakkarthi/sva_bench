@@ -59,9 +59,15 @@ clear -all
 
 analyze -v2k -f ${benchmark}.f
 analyze -sv -f ${benchmark}_sva.f
+check_cov -init -type mutation
 
 elaborate
 
 clock clk
 reset -none
+
+prove -all
+check_cov -measure
+check_cov -report
+exit
 EOF

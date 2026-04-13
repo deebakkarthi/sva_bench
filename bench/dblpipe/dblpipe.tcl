@@ -4,8 +4,15 @@
 clear -all
 
 analyze -v2k -f dblpipe.f
+analyze -sv -f dblpipe_sva.f
+check_cov -init -type mutation
 
 elaborate
 
-clock clk
-reset reset
+clock i_clk
+reset -none
+
+prove -all
+check_cov -measure
+check_cov -report
+exit
