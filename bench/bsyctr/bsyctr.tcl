@@ -7,12 +7,28 @@ analyze -v2k -f bsyctr.f
 analyze -sv -f bsyctr_sva.f
 check_cov -init -type mutation
 
-elaborate
+elaborate 
 
 clock i_clk
 reset -none
 
-prove -all
+prove -all -silent
+
+puts [format "SVABENCH:Total Assertions: %s" [llength [get_property_list \
+-include {type {assert} }]];]
+
+puts [format "SVABENCH:Proven: %s" [llength [get_property_list \
+-include {type {assert} status {proven} }]];]
+
+puts [format "SVABENCH:CEX: %s" [llength [get_property_list \
+-include {type {assert} status {cex} }]];]
+
+puts [format "SVABENCH:Covered: %s" [llength [get_property_list \
+-include {type {assert} related_cover_status {green white} }]];]
+
+puts [format "SVABENCH:Proven and Covered: %s" [llength [get_property_list\
+-include {type {assert} status {proven} related_cover_status {green white} }]];]
+
 check_cov -measure
 check_cov -report
 exit

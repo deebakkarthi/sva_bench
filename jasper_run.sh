@@ -12,10 +12,11 @@ function log(){
 }
 
 function usage(){
-	echo -ne "Usage: $progname [-v]\n\
- Run jaspergold on all the benchmarks under bench/\n\
+	echo -ne "Usage: $progname [-v] [-f] [--dir DIR]\n\
+ Run jaspergold on the most recent result/\n\
  -v\tVerbose mode\n\
- -f\tOverwrite previous results\n"
+ -f\tOverwrite previous results\n\
+ --dir DIR\tdirectory to use instead of the most recent result\n"
 }
 
 
@@ -27,6 +28,21 @@ while (( $# )); do
 			;;
 		"-f")
 			_FORCE=true
+			shift
+			;;
+		"--dir")
+			if [[ -z "$2" ]]; then
+				echo "$progname: DIR not provided"
+				usage
+				exit 1
+			fi
+			results_dir=$(realpath $2)
+			if [[ ! -d $results_dir ]];then
+				echo "$progname: $results_dir doesn't exit"
+				exit 1
+			fi
+
+			shift
 			shift
 			;;
 		*)
@@ -44,10 +60,12 @@ fi
 SVABENCH_ROOT=$(realpath $SVABENCH_ROOT)
 log "\$SVABENCH_ROOT is set to $SVABENCH_ROOT"
 
-
-results_dir=$(find -L results/ -depth -maxdepth 1 -mindepth 1 -type d\
-       	-exec stat --format "%X %n" {} \; | sort -r | head -n 1 |\
-       	cut -d" " -f 2| xargs realpath)
+# No results_dir provided. Use the most recent result
+if [[ -z $results_dir ]];then
+	results_dir=$(find -L results/ -depth -maxdepth 1 -mindepth 1 -type d\
+		-exec stat --format "%X %n" {} \; | sort -r | head -n 1 |\
+		cut -d" " -f 2| xargs realpath)
+fi
 
 readarray benchmarks < <(find -L $results_dir -depth -maxdepth 1\
 	-mindepth 1 -type d)
