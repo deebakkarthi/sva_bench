@@ -36,7 +36,5 @@ if [[ ! -f "$jglog_file" ]]; then
 	exit 1
 fi
 
-
-# Use sed to grab stuff
-# properties is the second line from /^SUMMARY$/
-cat $jglog_file | grep "^SVABENCH"
+grep "^SVABENCH" $jglog_file
+exit 0

@@ -62,6 +62,7 @@ analyze -sv -f ${benchmark}_sva.f
 check_cov -init -type mutation
 
 elaborate
+set top_module [dict get [lindex [elaborate -list -silent] 0] main]
 
 clock clk
 reset -none
@@ -85,5 +86,8 @@ puts [format "SVABENCH:Proven and Covered: %s" [llength [get_property_list\
 
 check_cov -measure
 check_cov -report
+puts "SVABENCH:Formal Coverage:\
+[dict get [string range [dict keys [check_cov -report -silent]]  1 end-1]\
+$top_module formal_coverage coverage_percentage]"
 exit
 EOF
