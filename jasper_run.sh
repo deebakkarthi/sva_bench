@@ -62,9 +62,7 @@ log "\$SVABENCH_ROOT is set to $SVABENCH_ROOT"
 
 # No results_dir provided. Use the most recent result
 if [[ -z $results_dir ]];then
-	results_dir=$(find -L results/ -depth -maxdepth 1 -mindepth 1 -type d\
-		-exec stat --format "%X %n" {} \; | sort -r | head -n 1 |\
-		cut -d" " -f 2| xargs realpath)
+	results_dir=$($SVABENCH_ROOT/scripts/most_recent_result.sh)
 fi
 
 readarray benchmarks < <(find -L $results_dir -depth -maxdepth 1\
